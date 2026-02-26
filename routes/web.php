@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ColocationController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,12 @@ Route::middleware([
     // Colocation routes
     Route::get('/colocations/create', [ColocationController::class, 'create'])->name('colocations.create');
     Route::post('/colocations/store', [ColocationController::class, 'store'])->name('colocations.store');
-    Route::get('/colocations/{colocation}', [ColocationController::class, 'show'])->name('colocations.show');    
+    Route::get('/colocations/{colocation}', [ColocationController::class, 'show'])->name('colocations.show');
+    
+    // Invitation routes
+    Route::post('/invitations/store', [InvitationController::class, 'store'])->name('invitations.store');
+    Route::get('/invitations/accept/{token}', [InvitationController::class, 'accept'])->name('invitations.accept');
+    Route::post('/invitations/confirm/{token}', [InvitationController::class, 'confirmAccept'])->name('invitations.confirm');
+    Route::get('/invitations/decline/{token}', [InvitationController::class, 'decline'])->name('invitations.decline');    
    
 });

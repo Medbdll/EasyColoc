@@ -74,14 +74,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900">Pending Invitations</h3>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-gray-500 text-center py-4">No pending invitations</p>
-                    </div>
-                </div>
+                
             </div>
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mt-6">
                 <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -97,58 +90,53 @@
         </div>
     </div>
 
-    <div id="inviteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div id="inviteModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 glass-effect rounded-2xl shadow-2xl w-full max-w-md slide-up">
             <div class="mt-3">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Invite Members</h3>
-                    <button onclick="hideInviteModal()" class="text-gray-400 hover:text-gray-600">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </div>
+                        Invite Members
+                    </h3>
+                    <button onclick="hideInviteModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                 </div>
                 
-                <form action="" method="POST">
+                <form action="{{ route('invitations.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="colocation_id" value="{{ $colocation->id }}">
                     
-                    <div class="mb-4">
-                        <label for="emails" class="block text-sm font-medium text-gray-700 mb-2">
-                            Email Addresses (comma separated)
+                    <div class="mb-5">
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Email Address
                         </label>
-                        <textarea 
-                            id="emails" 
-                            name="emails" 
-                            rows="3" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="friend1@example.com, friend2@example.com"
-                            required></textarea>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-                            Personal Message (optional)
-                        </label>
-                        <textarea 
-                            id="message" 
-                            name="message" 
-                            rows="3" 
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Join our colocation!"></textarea>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white/80 backdrop-blur-sm transition-all"
+                            placeholder="friend@example.com"
+                            required>
                     </div>
                     
                     <div class="flex justify-end space-x-3">
                         <button 
                             type="button" 
                             onclick="hideInviteModal()" 
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
+                            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium">
                             Cancel
                         </button>
                         <button 
                             type="submit" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                            Send Invitations
+                            class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105">
+                            Send Invitation
                         </button>
                     </div>
                 </form>
