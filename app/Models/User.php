@@ -56,6 +56,7 @@ class User extends Authenticatable
         'password',
         'reputation',
         'role',
+        'status',
     ];
 
     /**
@@ -91,6 +92,9 @@ class User extends Authenticatable
             'password' => 'hashed',
             'reputation' => 'decimal:2',
             'role' => 'string',
+            'status' => 'string',
         ];
     }
+
+ 
 }
