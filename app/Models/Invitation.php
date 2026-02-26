@@ -15,14 +15,13 @@ class Invitation extends Model
         'email',
         'token',
         'colocation_id',
+        'created_by',
+        'status',
     ];
 
     public function colocation(): BelongsTo
     {
         return $this->belongsTo(Colocation::class);
     }
-
-    
-
-    
+ 
 }

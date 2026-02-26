@@ -37,7 +37,7 @@ class ColocationController extends Controller
             abort(403, 'You are not a member of this colocation.');
         }
 
-        $colocation->load(['users', 'expenses.user', 'invitations']);
+        $colocation->load(['users', 'expenses.payer', 'expenses.category', 'invitations']);
 
         return view('colocations.show', compact('colocation'));
     }
