@@ -20,6 +20,7 @@ return new class extends Migration
             $table->rememberToken();
             $table->decimal('reputation', 3, 2)->default(0.00);
             $table->enum('role', ['admin', 'user'])->default('user');
+            $table->enum('status', ['banned', 'active'])->default('active');
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
             $table->timestamps();
