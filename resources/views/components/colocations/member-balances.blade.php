@@ -1,36 +1,51 @@
 @props(['memberBalances'])
 
-<div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mt-6">
-    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 class="text-lg font-medium text-gray-900">Member Balances</h3>
+<div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mt-6">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-white">Member Balances</h3>
+            <span class="bg-white bg-opacity-20 text-white text-sm px-3 py-1 rounded-full">
+                {{ count($memberBalances) }} member{{ count($memberBalances) > 1 ? 's' : '' }}
+            </span>
+        </div>
     </div>
+    
+    <!-- Balances List -->
     <div class="p-6">
-        <div class="space-y-3">
+        <div class="space-y-4">
             @foreach($memberBalances as $memberId => $balance)
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center">
-                        <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center mr-3">
-                            <span class="text-xs font-medium text-gray-700">
-                                {{ strtoupper(substr($balance['name'], 0, 1)) }}
-                            </span>
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                    <!-- User Info -->
+                    <div class="flex items-center flex-1">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center shadow-lg mr-3">
+                            <span class="text-white font-bold text-sm">{{ strtoupper(substr($balance['name'], 0, 1)) }}</span>
                         </div>
                         <div>
-                            <div class="text-sm font-medium text-gray-900">{{ $balance['name'] }}</div>
+                            <div class="font-semibold text-gray-900">{{ $balance['name'] }}</div>
                             <div class="text-xs text-gray-500">
                                 Paid: €{{ number_format($balance['total_paid'], 2) }} | Owed: €{{ number_format($balance['total_owed'], 2) }}
+                                @if(isset($balance['payments_made']) && $balance['payments_made'] > 0)
+                                    | Paid to others: €{{ number_format($balance['payments_made'], 2) }}
+                                @endif
+                                @if(isset($balance['payments_received']) && $balance['payments_received'] > 0)
+                                    | Received from others: €{{ number_format($balance['payments_received'], 2) }}
+                                @endif
                             </div>
                         </div>
                     </div>
-                    <div class="text-right">
+                    
+                    <!-- Balance -->
+                    <div class="text-right ml-4">
                         @if($balance['balance'] > 0)
-                            <div class="text-sm font-semibold text-green-600">+€{{ number_format($balance['balance'], 2) }}</div>
-                            <div class="text-xs text-green-500">To receive</div>
+                            <div class="text-lg font-bold text-green-600">+€{{ number_format($balance['balance'], 2) }}</div>
+                            <div class="text-xs text-green-500 font-medium">To receive</div>
                         @elseif($balance['balance'] < 0)
-                            <div class="text-sm font-semibold text-red-600">€{{ number_format($balance['balance'], 2) }}</div>
-                            <div class="text-xs text-red-500">To pay</div>
+                            <div class="text-lg font-bold text-red-600">€{{ number_format(abs($balance['balance']), 2) }}</div>
+                            <div class="text-xs text-red-500 font-medium">To pay</div>
                         @else
-                            <div class="text-sm font-semibold text-gray-600">€0.00</div>
-                            <div class="text-xs text-gray-500">Balanced</div>
+                            <div class="text-lg font-bold text-gray-600">€0.00</div>
+                            <div class="text-xs text-gray-500 font-medium">Balanced</div>
                         @endif
                     </div>
                 </div>

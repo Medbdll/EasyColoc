@@ -32,6 +32,8 @@ Route::middleware([
     Route::get('/colocations/create', [ColocationController::class, 'create'])->name('colocations.create');
     Route::post('/colocations/store', [ColocationController::class, 'store'])->name('colocations.store');
     Route::get('/colocations/{colocation}', [ColocationController::class, 'show'])->name('colocations.show');
+    Route::match(['get', 'post'], '/colocations/{colocation}/leave', [ColocationController::class, 'leaveColocation'])->name('colocations.leave');
+    Route::match(['get', 'post'], '/colocations/{colocation}/remove/{member}', [ColocationController::class, 'removeMember'])->name('colocations.remove');
     
     // Category routes
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
