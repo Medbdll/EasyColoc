@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Services;
+
+class BalanceCalculationService
+{
+    public function calculateMemberBalances($colocation)
+    {
+        $memberBalances = [];
+        
+        foreach($colocation->users as $member) {
+            $totalPaid = $colocation->expenses()->where('payer_id', $member->id)->sum('amount');
+            $totalOwed = 0;
+            
+            foreach($colocation->expenses as $expense) {
+                foreach($expense->participants as $participant) {
+                    if ($participant->id == $member->id) {
+                        $totalOwed += $participant->pivot->share_amount;
+                    }
+                }
+            }
+            
+            $memberBalances[$member->id] = [
+                'name' => $member->name,
+                'balance' => $totalPaid - $totalOwed,
+                'total_paid' => $totalPaid,
+                'total_owed' => $totalOwed
+            ];
+        }
+        
+        return $memberBalances;
+    }
+    
+    public function calculateRepayments($memberBalances)
+    {
+        $debtors = [];
+        $creditors = [];
+        
+        foreach($memberBalances as $memberId => $balance) {
+            if ($balance['balance'] < 0) {
+                $debtors[$memberId] = $balance;
+            } elseif ($balance['balance'] > 0) {
+                $creditors[$memberId] = $balance;
+            }
+        }
+        
+        $repayments = [];
+        foreach($debtors as $debtorId => $debtor) {
+            $remainingDebt = abs($debtor['balance']);
+            foreach($creditors as $creditorId => $creditor) {
+                if ($remainingDebt > 0.01 && $creditor['balance'] > 0.01) {
+                    $paymentAmount = min($remainingDebt, $creditor['balance']);
+                    $repayments[] = [
+                        'from' => $debtor['name'],
+                        'to' => $creditor['name'],
+                        'amount' => $paymentAmount
+                    ];
+                    $remainingDebt -= $paymentAmount;
+                }
+            }
+        }
+        
+        return $repayments;
+    }
+}
