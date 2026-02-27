@@ -20,11 +20,17 @@ class BalanceCalculationService
                 }
             }
             
+            // Calculate payments made and received
+            $paymentsMade = $colocation->payments()->where('payer_id', $member->id)->sum('amount');
+            $paymentsReceived = $colocation->payments()->where('receiver_id', $member->id)->sum('amount');
+            
             $memberBalances[$member->id] = [
                 'name' => $member->name,
-                'balance' => $totalPaid - $totalOwed,
+                'balance' => ($totalPaid + $paymentsReceived) - ($totalOwed + $paymentsMade),
                 'total_paid' => $totalPaid,
-                'total_owed' => $totalOwed
+                'total_owed' => $totalOwed,
+                'payments_made' => $paymentsMade,
+                'payments_received' => $paymentsReceived
             ];
         }
         
