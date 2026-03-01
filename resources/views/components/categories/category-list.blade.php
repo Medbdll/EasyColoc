@@ -1,11 +1,17 @@
 @props(['colocation'])
 
+@php
+    $currentUserRole = $colocation->users()->where('user_id', Auth::id())->first()?->pivot->colocation_role;
+@endphp
+
 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
     <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 class="text-lg font-medium text-gray-900">Categories</h3>
-        <button onclick="showCategoryModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-            Add Category
-        </button>
+        @if($currentUserRole === 'owner')
+            <button onclick="showCategoryModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
+                Add Category
+            </button>
+        @endif
     </div>
     <div class="p-6">
         @if($colocation->categories->count() > 0)
@@ -18,7 +24,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-sm font-semibold text-green-600">€{{ number_format($category->getTotalExpenses(), 2) }}</span>
-                            @if($category->expenses->count() == 0)
+                            @if($category->expenses->count() == 0 && $currentUserRole === 'owner')
                                 <form action="{{ route('categories.destroy', $category) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -36,7 +42,14 @@
                 @endforeach
             </div>
         @else
-            <p class="text-gray-500 text-center py-4">No categories yet. <button onclick="showCategoryModal()" class="text-purple-600 hover:text-purple-800">Create your first category</button>.</p>
+            <p class="text-gray-500 text-center py-4">
+                No categories yet. 
+                @if($currentUserRole === 'owner')
+                    <button onclick="showCategoryModal()" class="text-purple-600 hover:text-purple-800">Create your first category</button>
+                @else
+                    Ask the owner to create a category.
+                @endif
+            </p>
         @endif
     </div>
 </div>

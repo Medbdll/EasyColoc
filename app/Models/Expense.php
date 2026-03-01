@@ -14,6 +14,7 @@ class Expense extends Model
     protected $fillable = [
         'description',
         'amount',
+        'date',
         'payer_id',
         'colocation_id',
         'category_id',
@@ -21,6 +22,7 @@ class Expense extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'date' => 'date',
     ];
 
     public function payer(): BelongsTo

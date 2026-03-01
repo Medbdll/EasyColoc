@@ -16,6 +16,7 @@ class ExpenseController extends Controller
             $request->validate([
                 'description' => 'required|string|max:255',
                 'amount' => 'required|numeric|min:0.01',
+                'date' => 'required|date',
                 'category_id' => 'nullable|exists:categories,id',
                 'payer_id' => 'required|exists:users,id',
                 'colocation_id' => 'required|exists:colocations,id',
@@ -25,6 +26,7 @@ class ExpenseController extends Controller
             $request->validate([
                 'description' => 'required|string|max:255',
                 'amount' => 'required|numeric|min:0.01',
+                'date' => 'required|date',
                 'category_id' => 'nullable|exists:categories,id',
                 'payer_id' => 'required|exists:users,id',
                 'colocation_id' => 'required|exists:colocations,id',
@@ -57,6 +59,7 @@ class ExpenseController extends Controller
         $expense = Expense::create([
             'description' => $request->description,
             'amount' => $request->amount,
+            'date' => $request->date,
             'payer_id' => $request->payer_id,
             'colocation_id' => $request->colocation_id,
             'category_id' => $request->category_id,
@@ -112,5 +115,32 @@ class ExpenseController extends Controller
         $expense->delete();
 
         return redirect()->back()->with('success', 'Expense deleted successfully!');
+    }
+
+    public function index(Request $request, Colocation $colocation)
+    {
+        // Check if user is member of the colocation
+        if (!$colocation->users()->where('user_id', Auth::id())->exists()) {
+            abort(403, 'You are not a member of this colocation.');
+        }
+
+        $monthFilter = $request->get('month', 'all');
+        $expenseService = new \App\Services\ExpenseService();
+        
+        $expenses = $expenseService->getExpensesWithFilters($colocation, $monthFilter);
+        $monthlyOptions = $expenseService->getMonthlyOptions($colocation);
+        $categoryStats = $expenseService->getCategoryStats($colocation, $monthFilter);
+        $monthlyStats = $expenseService->getMonthlyStats($colocation);
+        $totalStats = $expenseService->getTotalStats($colocation, $monthFilter);
+
+        return view('expenses.index', compact(
+            'colocation',
+            'expenses',
+            'monthlyOptions',
+            'monthFilter',
+            'categoryStats',
+            'monthlyStats',
+            'totalStats'
+        ));
     }
 }

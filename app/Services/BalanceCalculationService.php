@@ -8,6 +8,9 @@ class BalanceCalculationService
     {
         $memberBalances = [];
         
+        // Refresh the users relationship to ensure we have the latest data
+        $colocation->load('users');
+        
         foreach($colocation->users as $member) {
             $totalPaid = $colocation->expenses()->where('payer_id', $member->id)->sum('amount');
             $totalOwed = 0;
