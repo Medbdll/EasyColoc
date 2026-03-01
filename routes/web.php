@@ -34,12 +34,14 @@ Route::middleware([
     Route::get('/colocations/{colocation}', [ColocationController::class, 'show'])->name('colocations.show');
     Route::match(['get', 'post'], '/colocations/{colocation}/leave', [ColocationController::class, 'leaveColocation'])->name('colocations.leave');
     Route::match(['get', 'post'], '/colocations/{colocation}/remove/{member}', [ColocationController::class, 'removeMember'])->name('colocations.remove');
+    Route::post('/colocations/{colocation}/members/{member}/mark-as-paid', [ColocationController::class, 'markAsPaid'])->name('members.mark-as-paid');
     
     // Category routes
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     
     // Expense routes
+    Route::get('/expenses/{colocation}', [ExpenseController::class, 'index'])->name('expenses.index');
     Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
     Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
     
