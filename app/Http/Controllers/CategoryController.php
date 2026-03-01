@@ -16,10 +16,11 @@ class CategoryController extends Controller
             'colocation_id' => 'required|exists:colocations,id',
         ]);
 
-        // Check if user is member of the colocation
+        // Check if user is owner of the colocation
         $colocation = Colocation::findOrFail($request->colocation_id);
-        if (!$colocation->users()->where('user_id', Auth::id())->exists()) {
-            return redirect()->back()->with('error', 'You are not a member of this colocation.');
+        $currentUserRole = $colocation->users()->where('user_id', Auth::id())->first()?->pivot->colocation_role;
+        if ($currentUserRole !== 'owner') {
+            return redirect()->back()->with('error', 'Only the owner can create categories.');
         }
 
         // Check if category already exists for this colocation
@@ -41,9 +42,10 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        // Check if user is member of the colocation
-        if (!$category->colocation->users()->where('user_id', Auth::id())->exists()) {
-            return redirect()->back()->with('error', 'You are not a member of this colocation.');
+        // Check if user is owner of the colocation
+        $currentUserRole = $category->colocation->users()->where('user_id', Auth::id())->first()?->pivot->colocation_role;
+        if ($currentUserRole !== 'owner') {
+            return redirect()->back()->with('error', 'Only the owner can delete categories.');
         }
 
         // Check if category has expenses
