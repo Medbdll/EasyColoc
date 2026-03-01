@@ -29,6 +29,16 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function hasActiveColocation(): bool
+    {
+        return $this->colocations()->exists();
+    }
+
+    public function getActiveColocation(): ?Colocation
+    {
+        return $this->colocations()->first();
+    }
+
     public function expenses(): HasMany
     {
         return $this->hasMany(Expense::class, 'payer_id');
