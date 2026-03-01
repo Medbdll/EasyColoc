@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ColocationController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\OldColocationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,10 @@ Route::middleware([
     Route::match(['get', 'post'], '/colocations/{colocation}/leave', [ColocationController::class, 'leaveColocation'])->name('colocations.leave');
     Route::match(['get', 'post'], '/colocations/{colocation}/remove/{member}', [ColocationController::class, 'removeMember'])->name('colocations.remove');
     Route::post('/colocations/{colocation}/members/{member}/mark-as-paid', [ColocationController::class, 'markAsPaid'])->name('members.mark-as-paid');
+    
+    // Old colocations routes
+    Route::get('/old-colocations', [OldColocationController::class, 'index'])->name('old-colocations.index');
+    Route::get('/old-colocations/{colocation}', [OldColocationController::class, 'show'])->name('old-colocations.show');
     
     // Category routes
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');

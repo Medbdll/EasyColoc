@@ -96,13 +96,24 @@ class InvitationController extends Controller
             return back()->with('error', 'This invitation is for a different email address.');
         }
 
+        $colocation = $invitation->colocation;
+
         // Check if user already has an active colocation membership
         if (auth()->user()->hasActiveColocation()) {
             $activeColocation = auth()->user()->getActiveColocation();
             return back()->with('error', 'You already have an active colocation membership. You cannot join another colocation while being part of an existing one.');
         }
 
-        $colocation = $invitation->colocation;
+        // Check if user has previously been a member of this colocation
+        $previousMembership = \App\Models\ColocationMembershipHistory::where('user_id', auth()->id())
+            ->where('colocation_id', $colocation->id)
+            ->whereNotNull('left_at')
+            ->first();
+
+        if ($previousMembership) {
+            return back()->with('error', 'You cannot rejoin a colocation you have previously left. You can only view its history from your old colocations.');
+        }
+
         $newMember = auth()->user();
         
         try {
@@ -119,6 +130,14 @@ class InvitationController extends Controller
                 'colocation_role' => 'member',
                 'created_at' => now(),
                 'updated_at' => now()
+            ]);
+
+            // Create membership history record
+            \App\Models\ColocationMembershipHistory::create([
+                'user_id' => $newMember->id,
+                'colocation_id' => $colocation->id,
+                'colocation_role' => 'member',
+                'joined_at' => now(),
             ]);
 
             // Redistribute existing debt among all members (including new member)
