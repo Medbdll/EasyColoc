@@ -1,4 +1,8 @@
-@props(['memberBalances'])
+@props(['memberBalances', 'colocation'])
+
+@php
+    $currentUserRole = $colocation->users()->where('user_id', Auth::id())->first()?->pivot->colocation_role;
+@endphp
 
 <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mt-6">
     <!-- Header -->
@@ -23,15 +27,6 @@
                         </div>
                         <div>
                             <div class="font-semibold text-gray-900">{{ $balance['name'] }}</div>
-                            <div class="text-xs text-gray-500">
-                                Paid: €{{ number_format($balance['total_paid'], 2) }} | Owed: €{{ number_format($balance['total_owed'], 2) }}
-                                @if(isset($balance['payments_made']) && $balance['payments_made'] > 0)
-                                    | Paid to others: €{{ number_format($balance['payments_made'], 2) }}
-                                @endif
-                                @if(isset($balance['payments_received']) && $balance['payments_received'] > 0)
-                                    | Received from others: €{{ number_format($balance['payments_received'], 2) }}
-                                @endif
-                            </div>
                         </div>
                     </div>
                     
@@ -41,8 +36,22 @@
                             <div class="text-lg font-bold text-green-600">+€{{ number_format($balance['balance'], 2) }}</div>
                             <div class="text-xs text-green-500 font-medium">To receive</div>
                         @elseif($balance['balance'] < 0)
-                            <div class="text-lg font-bold text-red-600">€{{ number_format(abs($balance['balance']), 2) }}</div>
-                            <div class="text-xs text-red-500 font-medium">To pay</div>
+                            <div class="flex items-center justify-end">
+                                <div>
+                                    <div class="text-lg font-bold text-red-600">€{{ number_format(abs($balance['balance']), 2) }}</div>
+                                    <div class="text-xs text-red-500 font-medium">To pay</div>
+                                </div>
+                                @if($currentUserRole === 'owner' && $memberId !== Auth::id())
+                                    <form action="{{ route('members.mark-as-paid', [$colocation, $memberId]) }}" method="POST" class="ml-3">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+                                                onclick="return confirm('Mark this member\'s debt as paid? This will reset their balance to €0.00.')">
+                                            Mark as Paid
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         @else
                             <div class="text-lg font-bold text-gray-600">€0.00</div>
                             <div class="text-xs text-gray-500 font-medium">Balanced</div>
