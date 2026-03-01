@@ -17,9 +17,11 @@ class ColocationController extends Controller
 
     public function store(Request $request)
     {
-        // Check if user already has a colocation
-        if (Auth::user()->colocations()->exists()) {
-            return redirect()->route('dashboard')->with('error', 'You can only have one colocation.');
+        // Check if user already has an active colocation membership
+        if (Auth::user()->hasActiveColocation()) {
+            $activeColocation = Auth::user()->getActiveColocation();
+            return redirect()->route('colocations.show', $activeColocation)
+                ->with('error', 'You already have an active colocation membership. You cannot create a new colocation while being part of an existing one.');
         }
 
         $validated = $request->validate([

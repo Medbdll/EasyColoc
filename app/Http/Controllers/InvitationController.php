@@ -37,6 +37,11 @@ class InvitationController extends Controller
             return back()->with('error', 'This user is already a member of the colocation.');
         }
 
+        // Check if target user already has an active colocation membership
+        if ($existingUser && $existingUser->hasActiveColocation()) {
+            return back()->with('error', 'This user already has an active colocation membership and cannot join another colocation.');
+        }
+
         // Check if invitation already exists
         if (Invitation::where('email', $email)
             ->where('colocation_id', $colocation->id)
@@ -89,6 +94,12 @@ class InvitationController extends Controller
         // Verify email matches
         if (auth()->user()->email !== $invitation->email) {
             return back()->with('error', 'This invitation is for a different email address.');
+        }
+
+        // Check if user already has an active colocation membership
+        if (auth()->user()->hasActiveColocation()) {
+            $activeColocation = auth()->user()->getActiveColocation();
+            return back()->with('error', 'You already have an active colocation membership. You cannot join another colocation while being part of an existing one.');
         }
 
         $colocation = $invitation->colocation;
