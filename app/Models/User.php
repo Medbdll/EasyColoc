@@ -44,6 +44,22 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class, 'receiver_id');
     }
 
+    public function updateReputation(float $change): void
+    {
+        $this->reputation += $change;
+        $this->save();
+    }
+
+    public function decreaseReputation(): void
+    {
+        $this->updateReputation(-1.0);
+    }
+
+    public function increaseReputation(): void
+    {
+        $this->updateReputation(1.0);
+    }
+
 
     /**
      * The attributes that are mass assignable.

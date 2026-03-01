@@ -33,7 +33,8 @@ class BalanceCalculationService
                 'total_paid' => $totalPaid,
                 'total_owed' => $totalOwed,
                 'payments_made' => $paymentsMade,
-                'payments_received' => $paymentsReceived
+                'payments_received' => $paymentsReceived,
+                'reputation' => $member->reputation
             ];
         }
         

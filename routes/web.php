@@ -49,6 +49,7 @@ Route::middleware([
     Route::post('/invitations/store', [InvitationController::class, 'store'])->name('invitations.store');
     Route::get('/invitations/accept/{token}', [InvitationController::class, 'accept'])->name('invitations.accept');
     Route::post('/invitations/confirm/{token}', [InvitationController::class, 'confirmAccept'])->name('invitations.confirm');
-    Route::get('/invitations/decline/{token}', [InvitationController::class, 'decline'])->name('invitations.decline');    
+    Route::get('/invitations/decline/{token}', [InvitationController::class, 'decline'])->name('invitations.decline');
+    Route::post('/invitations/{invitation}/cancel', [InvitationController::class, 'cancel'])->name('invitations.cancel');    
    
 });
