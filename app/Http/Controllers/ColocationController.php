@@ -99,6 +99,13 @@ class ColocationController extends Controller
                         // Remove current owner from colocation
                         $colocation->users()->detach($user->id);
                         
+                        // Update reputation based on debt status
+                        if ($hasDebt) {
+                            $user->decreaseReputation(); // -1 for leaving with debt
+                        } else {
+                            $user->increaseReputation(); // +1 for leaving without debt
+                        }
+                        
                         DB::commit();
                         
                         $message = $hasDebt 
@@ -136,6 +143,13 @@ class ColocationController extends Controller
                 }
                 
                 $colocation->users()->detach($user->id);
+                
+                // Update reputation based on debt status
+                if ($hasDebt) {
+                    $user->decreaseReputation(); // -1 for leaving with debt
+                } else {
+                    $user->increaseReputation(); // +1 for leaving without debt
+                }
                 
                 DB::commit();
                 
@@ -194,6 +208,13 @@ class ColocationController extends Controller
                 }
                 
                 $colocation->users()->detach($member->id);
+                
+                // Update reputation based on debt status
+                if ($hasDebt) {
+                    $member->decreaseReputation(); // -1 for leaving with debt
+                } else {
+                    $member->increaseReputation(); // +1 for leaving without debt
+                }
                 
                 DB::commit();
                 
