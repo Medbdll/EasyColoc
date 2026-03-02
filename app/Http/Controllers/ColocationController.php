@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Colocation;
 use App\Models\User;
+use App\Models\ColocationMembershipHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +32,14 @@ class ColocationController extends Controller
         
         $colocation = Colocation::create($validated);
         Auth::user()->colocations()->attach($colocation->id, ['colocation_role' => 'owner']);
+        
+        // Create membership history record
+        ColocationMembershipHistory::create([
+            'user_id' => Auth::id(),
+            'colocation_id' => $colocation->id,
+            'colocation_role' => 'owner',
+            'joined_at' => now(),
+        ]);
         
         return redirect()->route('colocations.show', $colocation)->with('success', 'Colocation created successfully!');
     }
@@ -101,6 +110,16 @@ class ColocationController extends Controller
                         // Remove current owner from colocation
                         $colocation->users()->detach($user->id);
                         
+                        // Update membership history
+                        ColocationMembershipHistory::where('user_id', $user->id)
+                            ->where('colocation_id', $colocation->id)
+                            ->whereNull('left_at')
+                            ->update([
+                                'left_at' => now(),
+                                'leave_reason' => 'Left as owner (transferred ownership)',
+                                'debt_amount' => $hasDebt ? abs($memberBalance) : 0,
+                            ]);
+                        
                         // Update reputation based on debt status
                         if ($hasDebt) {
                             $user->decreaseReputation(); // -1 for leaving with debt
@@ -145,6 +164,16 @@ class ColocationController extends Controller
                 }
                 
                 $colocation->users()->detach($user->id);
+                
+                // Update membership history
+                ColocationMembershipHistory::where('user_id', $user->id)
+                    ->where('colocation_id', $colocation->id)
+                    ->whereNull('left_at')
+                    ->update([
+                        'left_at' => now(),
+                        'leave_reason' => $hasDebt ? 'Left with debt' : 'Left voluntarily',
+                        'debt_amount' => $hasDebt ? abs($memberBalance) : 0,
+                    ]);
                 
                 // Update reputation based on debt status
                 if ($hasDebt) {
@@ -210,6 +239,16 @@ class ColocationController extends Controller
                 }
                 
                 $colocation->users()->detach($member->id);
+                
+                // Update membership history
+                ColocationMembershipHistory::where('user_id', $member->id)
+                    ->where('colocation_id', $colocation->id)
+                    ->whereNull('left_at')
+                    ->update([
+                        'left_at' => now(),
+                        'leave_reason' => 'Removed by owner',
+                        'debt_amount' => $hasDebt ? abs($memberBalance) : 0,
+                    ]);
                 
                 // Update reputation based on debt status
                 if ($hasDebt) {

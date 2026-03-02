@@ -54,6 +54,16 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class, 'receiver_id');
     }
 
+    public function colocationHistory(): HasMany
+    {
+        return $this->hasMany(ColocationMembershipHistory::class);
+    }
+
+    public function oldColocations(): HasMany
+    {
+        return $this->colocationHistory()->left()->with('colocation');
+    }
+
     public function updateReputation(float $change): void
     {
         $this->reputation += $change;

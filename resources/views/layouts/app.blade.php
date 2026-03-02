@@ -91,7 +91,7 @@
         <x-banner />
 
         <div class="min-h-screen">
-            @livewire('navigation-menu')
+            @include('navigation-menu')
 
             <!-- Page Heading -->
             @if (isset($header))
@@ -113,7 +113,7 @@
 
             <!-- Page Content -->
             <main class="fade-in">
-                {{ $slot }}
+                @yield('content')
             </main>
         </div>
 
